@@ -1,9 +1,18 @@
 import React, { useContext, useState } from "react";
 import { Form, Modal, Select, Spin, Avatar } from "antd";
-import debounce from "lodash/debounce";
+
 import { db } from "../../firebase/config";
 import { AppContext } from "../../context/appProvider";
 
+const debounce = (func: any, timeout = 300) => {
+  let timer: any;
+  return (...args: any) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func.apply(this, args);
+    }, timeout);
+  };
+};
 function DebounceSelect({
   fetchOptions,
   debounceTimeout = 300,
