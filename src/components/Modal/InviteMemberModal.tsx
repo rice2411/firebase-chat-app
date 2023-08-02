@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { Form, Modal, Select, Spin, Avatar } from "antd";
-import _ from "lodash";
+import debounce from "lodash/debounce";
 import { db } from "../../firebase/config";
 import { AppContext } from "../../context/appProvider";
 
@@ -26,7 +26,7 @@ function DebounceSelect({
       });
     };
 
-    return _.debounce(loadOptions, debounceTimeout);
+    return debounce(loadOptions, debounceTimeout);
   }, [debounceTimeout, fetchOptions, curMembers]);
 
   React.useEffect(() => {
