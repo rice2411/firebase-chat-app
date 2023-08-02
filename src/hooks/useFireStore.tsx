@@ -31,7 +31,7 @@ const useFirestore = (collection: any, condition: any) => {
       }));
       if (
         collection === "messages" &&
-        documents[documents.length - 1].uid !== uid
+        documents[documents.length - 1]?.uid !== uid
       ) {
         sound.load();
         sound.play();
