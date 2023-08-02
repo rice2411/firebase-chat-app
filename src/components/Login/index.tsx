@@ -1,6 +1,5 @@
-import React from "react";
 import { Row, Col, Typography, Button } from "antd";
-import firebase, { auth, db } from "../../firebase/config";
+import firebase, { auth } from "../../firebase/config";
 import { addDocument, generateKeywords } from "../../firebase/service";
 const { Title } = Typography;
 

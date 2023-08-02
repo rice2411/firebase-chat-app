@@ -5,7 +5,7 @@ import { AuthContext } from "../context/authProvider";
 const useFirestore = (collection: any, condition: any) => {
   const [documents, setDocuments] = useState([]);
   const sound: HTMLAudioElement = new Audio();
-  sound.src = "public/audio/noti.mp3";
+  sound.src = "/audio/noti.mp3";
   const { uid } = React.useContext(AuthContext);
 
   React.useEffect(() => {

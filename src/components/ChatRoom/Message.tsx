@@ -1,4 +1,3 @@
-import React from "react";
 import { Avatar, Typography } from "antd";
 import styled from "styled-components";
 import { formatRelative } from "date-fns";
