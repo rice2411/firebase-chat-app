@@ -28,7 +28,7 @@ export default createBrowserRouter([
       },
       {
         element: <ChatRoom />,
-        path: "/chatroom",
+        path: "/",
       },
     ],
   },

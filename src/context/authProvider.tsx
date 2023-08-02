@@ -29,7 +29,7 @@ const AuthProvider = ({ children }: any) => {
         const { displayName, email, uid, photoURL } = user;
         setUser({ displayName, email, uid, photoURL });
         setIsLoading(false);
-        navigate("/chatroom");
+        navigate("/");
       } else {
         setIsLoading(false);
         navigate("/login");
