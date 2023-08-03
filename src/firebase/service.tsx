@@ -9,6 +9,35 @@ export const addDocument = (collection: string, data: any) => {
   });
 };
 
+export const removeDocumentsByConditions = async (
+  collectionPath: string,
+  conditions: any
+) => {
+  try {
+    const collectionRef = firebase.firestore().collection(collectionPath);
+
+    // Create a query with multiple conditions
+    let query: any = collectionRef;
+    conditions.forEach((condition: any) => {
+      query = query.where(condition.field, condition.operator, condition.value);
+    });
+
+    // Get the documents matching the conditions
+    const snapshot = await query.get();
+
+    // Delete each document in the result set
+    const batch = firebase.firestore().batch();
+    snapshot.forEach((doc: any) => batch.delete(doc.ref));
+
+    // Commit the batch to delete the documents
+    await batch.commit();
+
+    console.log(`Documents matching the conditions deleted successfully.`);
+  } catch (error) {
+    console.error("Error deleting documents:", error);
+  }
+};
+
 // tao keywords cho displayName, su dung cho search
 export const generateKeywords = (displayName: string) => {
   // liet ke tat cac hoan vi. vd: name = ["David", "Van", "Teo"]

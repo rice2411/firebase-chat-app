@@ -5,7 +5,10 @@ import { Button, Tooltip, Avatar, Form, Input, Alert } from "antd";
 import Message from "./Message";
 import { AppContext } from "../../context/appProvider";
 import { AuthContext } from "../../context/authProvider";
-import { addDocument } from "../../firebase/service";
+import {
+  addDocument,
+  removeDocumentsByConditions,
+} from "../../firebase/service";
 import useFirestore from "../../hooks/useFireStore";
 
 const HeaderStyled = styled.div`
@@ -74,6 +77,7 @@ export default function ChatWindow() {
     useContext(AppContext);
   const { uid, photoURL, displayName } = useContext(AuthContext);
   const [inputValue, setInputValue] = useState("");
+
   const [form] = Form.useForm();
   const inputRef: any = useRef(null);
   const messageListRef: any = useRef(null);
@@ -81,7 +85,46 @@ export default function ChatWindow() {
   const handleInputChange = (e: any) => {
     setInputValue(e.target.value);
   };
+  const conditionTyping = React.useMemo(
+    () => ({
+      fieldName: "roomId",
+      operator: "==",
+      compareValue: selectedRoom.id,
+    }),
+    [selectedRoom.id]
+  );
+  const listTyping: any = useFirestore("typing", conditionTyping);
+  console.log(listTyping);
+  const handleStartTyping = (e: any) => {
+    if (e.target.value != "") {
+      const room = listTyping.find(
+        (item: any) => item.roomId == selectedRoom.id
+      );
+      const roomId = selectedRoom.id;
+      if (!room) {
+        addDocument("typing", {
+          uid,
+          displayName,
+          roomId,
+        });
+      }
 
+      // addDocument("typing", {
+      //   uid,
+      //   displayName,
+      // });
+    }
+  };
+  const handleEndTyping = () => {
+    const room = listTyping.find((item: any) => item.roomId == selectedRoom.id);
+    if (room) {
+      const conditions = [
+        { field: "uid", operator: "==", value: uid },
+        { field: "roomId", operator: "==", value: selectedRoom.id },
+      ];
+      removeDocumentsByConditions("typing", conditions);
+    }
+  };
   const handleOnSubmit = () => {
     addDocument("messages", {
       text: inputValue,
@@ -100,7 +143,6 @@ export default function ChatWindow() {
       });
     }
   };
-
   const condition = React.useMemo(
     () => ({
       fieldName: "roomId",
@@ -110,8 +152,6 @@ export default function ChatWindow() {
     [selectedRoom.id]
   );
   const messages = useFirestore("messages", condition);
-  console.log(messages);
-
   useEffect(() => {
     // scroll to bottom after message changed
     if (messageListRef?.current) {
@@ -152,6 +192,7 @@ export default function ChatWindow() {
               </Avatar.Group>
             </ButtonGroupStyled>
           </HeaderStyled>
+
           <ContentStyled>
             <MessageListStyled ref={messageListRef}>
               {messages.map((mes: any) => (
@@ -163,13 +204,40 @@ export default function ChatWindow() {
                   createdAt={mes.createdAt}
                 />
               ))}
-            </MessageListStyled>
+            </MessageListStyled>{" "}
+            <p>
+              {listTyping.length > 0 ? (
+                <>
+                  {listTyping
+                    .filter((item: any) => item.uid !== uid)
+                    .map((item: any, index: number) => (
+                      <>
+                        {item.displayName}{" "}
+                        {listTyping.length > 1 && index != listTyping.length - 1
+                          ? ","
+                          : ""}
+                        is typing...
+                      </>
+                    ))}
+                </>
+              ) : (
+                ""
+              )}
+            </p>
             <FormStyled form={form}>
               <Form.Item name="message">
                 <Input
                   ref={inputRef}
-                  onChange={handleInputChange}
+                  onChange={(e) => {
+                    handleInputChange(e);
+                    handleStartTyping(e);
+                    if (e.target.value == "") {
+                      handleEndTyping();
+                    }
+                  }}
                   onPressEnter={handleOnSubmit}
+                  onFocus={handleStartTyping}
+                  onBlur={handleEndTyping}
                   placeholder="Nhập tin nhắn..."
                   bordered={false}
                   autoComplete="off"
