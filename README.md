@@ -1,5 +1,4 @@
-Live demo: https://firebase-chat-app-ten.vercel.app/
-
+Live demo: https://firebase-chat-app-rice.netlify.app/
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
